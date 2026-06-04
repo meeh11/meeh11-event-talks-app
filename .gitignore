@@ -1,0 +1,11 @@
+# Node.js
+node_modules/
+
+# Generated files
+index.html
+
+# Gemini CLI internal files
+.gemini/
+
+# Temporary files
+eclipse-dates.txt

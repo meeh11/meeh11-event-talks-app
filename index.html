@@ -1,0 +1,337 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech Talks Event Schedule</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+        .search-bar {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .search-bar input[type="text"] {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 70%;
+            max-width: 400px;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        .search-bar button {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        .search-bar button:hover {
+            background-color: #2980b9;
+        }
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        .schedule-item {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 5px solid #3498db;
+            position: relative;
+        }
+        .schedule-item.break {
+            background-color: #f39c12;
+            color: white;
+            border-left-color: #e67e22;
+            text-align: center;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 80px;
+        }
+        .schedule-item.transition {
+            background-color: #bdc3c7;
+            color: #555;
+            border-left-color: #95a5a6;
+            text-align: center;
+            font-style: italic;
+            padding: 10px;
+        }
+        .schedule-item h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .schedule-item.break h3 {
+             color: white;
+        }
+        .schedule-item .time {
+            font-weight: bold;
+            color: #34495e;
+            margin-bottom: 5px;
+        }
+        .schedule-item.break .time {
+             color: white;
+        }
+        .schedule-item .speakers {
+            font-style: italic;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+        }
+        .schedule-item .categories span {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        .schedule-item .description {
+            font-size: 0.9em;
+            color: #555;
+        }
+        .no-results {
+            text-align: center;
+            font-size: 1.2em;
+            color: #7f8c8d;
+            padding: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Tech Talks: A Day of Innovation</h1>
+        <div class="search-bar">
+            <input type="text" id="categorySearch" placeholder="Search by category (e.g., AI, Web Development)">
+            <button onclick="filterSchedule()">Search</button>
+            <button onclick="clearSearch()">Clear</button>
+        </div>
+        <div id="schedule" class="schedule-grid">
+            <!-- Schedule items will be rendered here by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        const allScheduleItems = [
+  {
+    "type": "talk",
+    "title": "Introduction to AI",
+    "speakers": [
+      "Alice Smith"
+    ],
+    "category": [
+      "AI",
+      "Beginner"
+    ],
+    "duration": 60,
+    "description": "A foundational talk on Artificial Intelligence, covering basic concepts and applications.",
+    "startTime": "10:00 AM",
+    "endTime": "11:00 AM"
+  },
+  {
+    "type": "transition",
+    "title": "Transition",
+    "duration": 10,
+    "startTime": "11:00 AM",
+    "endTime": "11:10 AM"
+  },
+  {
+    "type": "talk",
+    "title": "Advanced JavaScript Techniques",
+    "speakers": [
+      "Bob Johnson",
+      "Charlie Brown"
+    ],
+    "category": [
+      "Web Development",
+      "JavaScript",
+      "Advanced"
+    ],
+    "duration": 60,
+    "description": "Dive deep into modern JavaScript, exploring ES6+ features, advanced patterns, and performance tips.",
+    "startTime": "11:10 AM",
+    "endTime": "12:10 PM"
+  },
+  {
+    "type": "transition",
+    "title": "Transition",
+    "duration": 10,
+    "startTime": "12:10 PM",
+    "endTime": "12:20 PM"
+  },
+  {
+    "type": "talk",
+    "title": "Cloud Native Architectures",
+    "speakers": [
+      "Diana Prince"
+    ],
+    "category": [
+      "Cloud",
+      "DevOps"
+    ],
+    "duration": 60,
+    "description": "Understanding the principles and practices of building scalable applications in the cloud.",
+    "startTime": "12:20 PM",
+    "endTime": "01:20 PM"
+  },
+  {
+    "type": "break",
+    "title": "Lunch Break",
+    "duration": 60,
+    "startTime": "01:20 PM",
+    "endTime": "02:20 PM"
+  },
+  {
+    "type": "transition",
+    "title": "Transition",
+    "duration": 10,
+    "startTime": "02:20 PM",
+    "endTime": "02:30 PM"
+  },
+  {
+    "type": "talk",
+    "title": "Data Science with Python",
+    "speakers": [
+      "Eve Adams"
+    ],
+    "category": [
+      "Data Science",
+      "Python"
+    ],
+    "duration": 60,
+    "description": "An overview of data science workflows using Python, including libraries like Pandas and Scikit-learn.",
+    "startTime": "02:30 PM",
+    "endTime": "03:30 PM"
+  },
+  {
+    "type": "transition",
+    "title": "Transition",
+    "duration": 10,
+    "startTime": "03:30 PM",
+    "endTime": "03:40 PM"
+  },
+  {
+    "type": "talk",
+    "title": "Frontend Frameworks Comparison",
+    "speakers": [
+      "Frank White"
+    ],
+    "category": [
+      "Web Development",
+      "Frontend"
+    ],
+    "duration": 60,
+    "description": "A comparative analysis of popular frontend frameworks like React, Angular, and Vue.js.",
+    "startTime": "03:40 PM",
+    "endTime": "04:40 PM"
+  },
+  {
+    "type": "transition",
+    "title": "Transition",
+    "duration": 10,
+    "startTime": "04:40 PM",
+    "endTime": "04:50 PM"
+  },
+  {
+    "type": "talk",
+    "title": "Cybersecurity Essentials",
+    "speakers": [
+      "Grace Hopper"
+    ],
+    "category": [
+      "Security",
+      "Networking"
+    ],
+    "duration": 60,
+    "description": "Key concepts and best practices for securing web applications and data.",
+    "startTime": "04:50 PM",
+    "endTime": "05:50 PM"
+  }
+];
+
+        function renderSchedule(filteredItems = allScheduleItems) {
+            const scheduleContainer = document.getElementById('schedule');
+            scheduleContainer.innerHTML = ''; // Clear previous content
+
+            if (filteredItems.length === 0) {
+                scheduleContainer.innerHTML = '<div class="no-results">No talks found matching your criteria.</div>';
+                return;
+            }
+
+            filteredItems.forEach(item => {
+                let itemHtml = '';
+                if (item.type === 'talk') {
+                    itemHtml = '<div class="schedule-item talk">' +
+                               '<div class="time">' + item.startTime + ' - ' + item.endTime + '</div>' +
+                               '<h3>' + item.title + '</h3>' +
+                               '<p class="speakers">Speaker(s): ' + item.speakers.join(', ') + '</p>' +
+                               '<div class="categories">' +
+                                   item.category.map(cat => '<span>' + cat + '</span>').join('') +
+                               '</div>' +
+                               '<p class="description">' + item.description + '</p>' +
+                               '</div>';
+                } else if (item.type === 'break') {
+                    itemHtml = '<div class="schedule-item break">' +
+                               '<div class="time">' + item.startTime + ' - ' + item.endTime + '</div>' +
+                               '<h3>' + item.title + ' (' + item.duration + ' min)</h3>' +
+                               '</div>';
+                } else if (item.type === 'transition') {
+                    itemHtml = '<div class="schedule-item transition">' +
+                               '<div class="time">' + item.startTime + ' - ' + item.endTime + '</div>' +
+                               '<p>' + item.title + ' (' + item.duration + ' min)</p>' +
+                               '</div>';
+                scheduleContainer.innerHTML += itemHtml;
+            });
+        }
+
+        function filterSchedule() {
+            const searchTerm = document.getElementById('categorySearch').value.toLowerCase();
+            const filtered = allScheduleItems.filter(item => {
+                if (item.type === 'talk') {
+                    return item.category.some(cat => cat.toLowerCase().includes(searchTerm));
+                }
+                // Always show breaks and transitions, or hide them based on preference?
+                // For now, always show non-talk items.
+                return true; 
+            });
+            renderSchedule(filtered);
+        }
+
+        function clearSearch() {
+            document.getElementById('categorySearch').value = '';
+            renderSchedule();
+        }
+
+        // Initial render on page load
+        document.addEventListener('DOMContentLoaded', renderSchedule);
+    </script>
+</body>
+</html>
